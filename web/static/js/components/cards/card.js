@@ -1,10 +1,12 @@
 import React, {PropTypes}       from 'react';
 import {DragSource, DropTarget} from 'react-dnd';
-import { routeActions }         from 'react-router-redux';
+import { push }                 from 'react-router-redux';
 import ReactGravatar            from 'react-gravatar';
+import classnames               from 'classnames';
 
 import ItemTypes                from '../../constants/item_types';
 import Actions                  from '../../actions/current_board';
+import CardActions              from '../../actions/current_card';
 
 const cardSource = {
   beginDrag(props) {
@@ -43,15 +45,16 @@ const cardTarget = {
   isDragging: monitor.isDragging()
 }))
 
-@DropTarget(ItemTypes.CARD, cardTarget, (connect) => ({
-  connectDropTarget: connect.dropTarget()
+@DropTarget(ItemTypes.CARD, cardTarget, (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver()
 }))
 
 export default class Card extends React.Component {
   _handleClick(e) {
     const { dispatch, id, boardId } = this.props;
 
-    this.props.dispatch(routeActions.push(`/boards/${boardId}/cards/${id}`));
+    dispatch(push(`/boards/${boardId}/cards/${id}`));
   }
 
   _renderFooter() {
@@ -93,18 +96,25 @@ export default class Card extends React.Component {
   }
 
   render() {
-    const { id, connectDragSource, connectDropTarget, isDragging, name } = this.props;
+    const { id, connectDragSource, connectDropTarget, isDragging, isOver, name } = this.props;
 
     const styles = {
       display: isDragging ? 'none' : 'block',
     };
 
+    const classes = classnames({
+      'card': true,
+      'is-over': isOver
+    });
+
     return connectDragSource(
       connectDropTarget(
-        <div id={`card_${id}`} className="card" style={styles} onClick={::this._handleClick}>
-          {::this._renderTags()}
-          {name}
-          {::this._renderFooter()}
+        <div id={`card_${id}`} className={classes} style={styles} onClick={::this._handleClick}>
+          <div className="card-content">
+            {::this._renderTags()}
+            {name}
+            {::this._renderFooter()}
+          </div>
         </div>
       )
     );

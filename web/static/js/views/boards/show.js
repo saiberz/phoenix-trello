@@ -125,13 +125,17 @@ class BoardsShowView extends React.Component {
     let targetList = lists[targetListIndex];
     const targetCardIndex = targetList.cards.findIndex((card) => { return card.id === target.id; });
     const targetCard = targetList.cards[targetCardIndex];
+    const previousTargetCard = sourceList.cards[sourceCardIndex + 1];
+
+    if (previousTargetCard === targetCard) { return false; }
 
     sourceList.cards.splice(sourceCardIndex, 1);
 
     if (sourceList === targetList) {
+      const insertIndex = sourceCardIndex < targetCardIndex ? targetCardIndex - 1 : targetCardIndex;
       // move at once to avoid complications
       targetList = sourceList;
-      sourceList.cards.splice(targetCardIndex, 0, source);
+      sourceList.cards.splice(insertIndex, 0, source);
     } else {
       // and move it to target
       targetList.cards.splice(targetCardIndex, 0, source);

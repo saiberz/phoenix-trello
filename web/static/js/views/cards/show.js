@@ -7,15 +7,20 @@ class CardsShowView extends React.Component {
   componentDidMount() {
     const { dispatch, params } = this.props;
 
-    console.log(params);
-
-    dispatch(Actions.showCard(params.id[0], params.id[1]));
+    dispatch(Actions.showCard(this._getCard(params.id[1])));
   }
 
   componentWillUnmount() {
     const { dispatch } = this.props;
 
     dispatch(Actions.reset());
+  }
+
+  _getCard(id) {
+    let cards = [];
+    this.props.currentBoard.lists.forEach((list) => { cards = cards.concat(list.cards); });
+
+    return cards.find((c) => { return c.id === +id;  });
   }
 
   render() {
